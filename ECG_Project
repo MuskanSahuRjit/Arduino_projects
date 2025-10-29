@@ -1,0 +1,24 @@
+// AD8232 ECG Sensor with Arduino
+
+// Pin Definitions
+const int ECGPin = A0;   // Analog pin connected to OUTPUT of AD8232
+const int LOPlus = 10;   // LO+ pin
+const int LOMinus = 11;  // LO- pin
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(LOPlus, INPUT);
+  pinMode(LOMinus, INPUT);
+}
+
+void loop() {
+  // Check if leads are off
+  if ((digitalRead(LOPlus) == 1) || (digitalRead(LOMinus) == 1)) {
+    Serial.println("WARNING: Leads Off");
+  } else {
+    int ecgValue = analogRead(ECGPin);
+    Serial.println(ecgValue);
+  }
+  
+  delay(1); // Small delay for stable reading (use Serial Plotter at 9600 baud)
+}
