@@ -1,0 +1,62 @@
+#include <Servo.h>
+
+// Define pins
+const int trigPin = 9;
+const int echoPin = 10;
+const int servoPin = 11;
+
+// Create Servo/RADAR object
+Servo myServo;
+
+// Variables
+long duration;
+int distance;
+int angle = 0;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  myServo.attach(servoPin);
+  Serial.println("Radar System Initialized");
+}
+
+void loop() {
+  // Sweep from 0° to 180°
+  for (angle = 0; angle <= 180; angle += 2) {
+    myServo.write(angle);
+    delay(30); // Wait for the servo to reach position
+    distance = getDistance();
+    Serial.print(angle);
+    Serial.print(",");
+    Serial.println(distance);
+  }
+
+  // Sweep back from 180° to 0°
+  for (angle = 180; angle >= 0; angle -= 2) {
+    myServo.write(angle);
+    delay(30);
+    distance = getDistance();
+    Serial.print(angle);
+    Serial.print(",");
+    Serial.println(distance);
+  }
+}
+
+// Function to get distance from ultrasonic sensor
+int getDistance() {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  duration = pulseIn(echoPin, HIGH);
+  int dist = duration * 0.034 / 2;
+
+  if (dist == 0 || dist > 400) {
+    return 400; // Limit maximum distance to 400 cm
+  }
+  return dist;
+}
